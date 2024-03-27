@@ -86,14 +86,14 @@ add_action( 'rest_api_init', function () {
 // Todos os jogos
 // **********
 add_action( 'rest_api_init', function () {
-    register_rest_route( 'games/v1', '/all-games', array(
+    register_rest_route( 'games/v1', '/games', array(
       'methods' => 'GET',
       'callback' => 'get_all_games_api',
     ) );
 } );
 
   function get_all_games_api(){
-    $games = array();
+    $retorno = array();
     
     $params = array(
         "limit" => -1,
@@ -101,21 +101,21 @@ add_action( 'rest_api_init', function () {
     );
 
     $mypod = pods( 'games', $params );
-    $games['total'] = $mypod->total();
-    $games['games'] = array();
+    $retorno['games'] = array();
+    $retorno['total'] = $mypod->total();
 
     while ( $mypod->fetch() ) {
-        $item = array(
+        $itemGame = array(
             'id' => $mypod->field('ID'),
             'nome' => $mypod->field('post_title'),
             'slug' => $mypod->field('slug'),
             'nota' => $mypod->field('nota'),
             'thumb' => $mypod->field('thumbnail')['guid'],
         );
-        $games['games'][] = $item;
+        $retorno['games'][] = $itemGame;
     }
 
-    return rest_ensure_response ( $games );
+    return rest_ensure_response ( $retorno );
   }
 
   // Outros Jogos
@@ -230,7 +230,7 @@ function get_game_by_slug_api( $request ) {
       'id' => $gamepod->field('ID'),
       'nome' => $gamepod->field('post_title'),
       'slug' => $gamepod->field('slug'),
-      'conteudo' => $gamepod->field('post_content'),
+      'descricao' => wp_strip_all_tags ($gamepod->field('post_content')),
       'thumbnail' => $gamepod->field('thumbnail')['guid'],
       'capa' => $gamepod->field('capa')['guid'],
       'plataformas' => $gamepod->field('plataformas'),
