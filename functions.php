@@ -8,6 +8,7 @@ add_action( 'rest_api_init', function () {
     register_rest_route( 'games/v1', '/sliders', array(
       'methods' => 'GET',
       'callback' => 'get_sliders_api',
+      'permission_callback' => '__return_true',
     ) );
 } );
 
@@ -52,6 +53,7 @@ add_action( 'rest_api_init', function () {
     register_rest_route( 'games/v1', '/seriestrines', array(
       'methods' => 'GET',
       'callback' => 'get_trines_api',
+      'permission_callback' => '__return_true',
     ) );
 } );
 
@@ -89,6 +91,7 @@ add_action( 'rest_api_init', function () {
     register_rest_route( 'games/v1', '/games', array(
       'methods' => 'GET',
       'callback' => 'get_all_games_api',
+      'permission_callback' => '__return_true',
     ) );
 } );
 
@@ -124,6 +127,7 @@ add_action( 'rest_api_init', function () {
   register_rest_route( 'games/v1', '/anothers', array(
     'methods' => 'GET',
     'callback' => 'get_anothers_api',
+    'permission_callback' => '__return_true',
   ) );
 } );
 
@@ -162,6 +166,7 @@ add_action( 'rest_api_init', function () {
   register_rest_route( 'games/v1', '/mods', array(
     'methods' => 'GET',
     'callback' => 'get_mods_api',
+    'permission_callback' => '__return_true',
   ) );
 } );
 
@@ -175,11 +180,10 @@ function get_mods_api(){
   );
 
   $mypod = pods( 'games', $params );
+  $mods['mods'] = array();
   $mods['total'] = $mypod->total();
 
-  $chaveId = 0;
   while ( $mypod->fetch() ) {
-      $chaveId++;
       $mod = array(
           'id' => $mypod->field('ID'),
           'nome' => $mypod->field('post_title'),
@@ -188,7 +192,7 @@ function get_mods_api(){
           'nota' => $mypod->field('nota'),
           'complemento' => $mypod->field('complemento'),
       );
-      $mods['mods'][$chaveId] = $mod;
+      $mods['mods'][] = $mod;
   }
 
   return rest_ensure_response ( $mods );
@@ -201,6 +205,7 @@ add_action( 'rest_api_init', function () {
   register_rest_route( 'games/v1', '/game/(?P<slug>[a-zA-Z0-9-]+)', array(
     'methods' => 'GET',
     'callback' => 'get_game_by_slug_api',
+    'permission_callback' => '__return_true',
     'args' => array(
       'slug' => array(
         'validate_callback' => function($param, $request, $key) {
